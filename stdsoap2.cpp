@@ -3851,6 +3851,43 @@ soap_match_tag(struct soap *soap, const char *tag1, const char *tag2)
 /******************************************************************************/
 
 SOAP_FMAC1
+bool
+SOAP_FMAC2
+soap_attr_find(const struct soap* soap, const std::string name, std::string& outval)
+{
+    struct soap_attribute* tp;
+
+    bool bFound = false;
+    for (tp = soap->attributes; tp; tp = tp->next)
+    {
+        std::string n = std::string(tp->name);
+        if (n == name) {
+            bFound = true;
+            break;
+        }
+    }
+
+    if (bFound)
+        outval = tp->value;
+
+    return bFound;
+}
+
+/******************************************************************************/
+
+SOAP_FMAC1
+bool
+SOAP_FMAC2
+soap_is_nil(const struct soap* soap)
+{
+    std::string outval;
+    bool hasNil = soap_attr_find(soap, "xsi:nil", outval);
+    return (hasNil && outval == "true");
+}
+
+/******************************************************************************/
+
+SOAP_FMAC1
 int
 SOAP_FMAC2
 soap_match_att(struct soap *soap, const char *tag1, const char *tag2)
@@ -16172,8 +16209,14 @@ soap_s2int(struct soap *soap, const char *s, int *p)
   {
     long n;
     char *r;
-    if (!*s)
-      return soap->error = SOAP_EMPTY;
+
+    if (!*s) 
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
+
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -16272,7 +16315,11 @@ soap_s2long(struct soap *soap, const char *s, long *p)
   {
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -16367,7 +16414,11 @@ soap_s2LONG64(struct soap *soap, const char *s, LONG64 *p)
   {
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -16468,7 +16519,11 @@ soap_s2byte(struct soap *soap, const char *s, char *p)
     long n;
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     n = soap_strtol(s, &r, 10);
     if (s == r || *r || n < -128 || n > 127)
       soap->error = SOAP_TYPE;
@@ -16551,7 +16606,11 @@ soap_s2short(struct soap *soap, const char *s, short *p)
     long n;
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     n = soap_strtol(s, &r, 10);
     if (s == r || *r || n < -32768 || n > 32767)
       soap->error = SOAP_TYPE;
@@ -16660,7 +16719,11 @@ soap_s2float(struct soap *soap, const char *s, float *p)
   if (s)
   {
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     if (!soap_tag_cmp(s, "INF"))
     {
       *p = FLT_PINFTY;
@@ -16871,7 +16934,11 @@ soap_s2double(struct soap *soap, const char *s, double *p)
   if (s)
   {
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     if (!soap_tag_cmp(s, "INF"))
     {
       *p = DBL_PINFTY;
@@ -16999,7 +17066,11 @@ soap_s2unsignedByte(struct soap *soap, const char *s, unsigned char *p)
     long n;
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     n = soap_strtol(s, &r, 10);
     if (s == r || *r || n < 0 || n > 255)
       soap->error = SOAP_TYPE;
@@ -17082,7 +17153,11 @@ soap_s2unsignedShort(struct soap *soap, const char *s, unsigned short *p)
     long n;
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     n = soap_strtol(s, &r, 10);
     if (s == r || *r || n < 0 || n > 65535)
       soap->error = SOAP_TYPE;
@@ -17165,7 +17240,11 @@ soap_s2unsignedInt(struct soap *soap, const char *s, unsigned int *p)
   {
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -17264,7 +17343,11 @@ soap_s2unsignedLong(struct soap *soap, const char *s, unsigned long *p)
   {
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -17363,7 +17446,11 @@ soap_s2ULONG64(struct soap *soap, const char *s, ULONG64 *p)
   {
     char *r;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
 #ifndef WITH_NOIO
 #ifndef WITH_LEAN
     soap_reset_errno;
@@ -18752,7 +18839,11 @@ soap_s2dateTime(struct soap *soap, const char *s, time_t *p)
     unsigned long d;
     struct tm T;
     if (!*s)
-      return soap->error = SOAP_EMPTY;
+#if WITH_IMPLICIT_NILLABLE
+        if (soap_is_nil(soap)) return soap->error = SOAP_OK;
+#else
+        return soap->error = SOAP_EMPTY;
+#endif
     memset((void*)&T, 0, sizeof(T));
     d = soap_strtoul(s, &t, 10);
     if (*t == '-')

@@ -3370,6 +3370,9 @@ SOAP_FMAC1 int SOAP_FMAC2 soap_element_end(struct soap*, const char *tag);
 
 SOAP_FMAC1 int SOAP_FMAC2 soap_attribute(struct soap*, const char*, const char*);
 
+SOAP_FMAC1 bool SOAP_FMAC2 soap_attr_find(const struct soap* soap, const std::string name, std::string& outval);
+SOAP_FMAC1 bool SOAP_FMAC2 soap_is_nil(const struct soap* soap);
+
 SOAP_FMAC1 int SOAP_FMAC2 soap_element_begin_in(struct soap*, const char *tag, int nillable, const char *type);
 
 SOAP_FMAC1 int SOAP_FMAC2 soap_element_end_in(struct soap*, const char *tag);

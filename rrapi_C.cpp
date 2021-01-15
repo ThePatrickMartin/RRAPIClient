@@ -15958,7 +15958,7 @@ SOAP_FMAC3 int SOAP_FMAC4 soap_out_ns1__TrsSite(struct soap *soap, const char *t
 	{	if (soap_element_empty(soap, "siteFreqs", 0, NULL))
 			return soap->error;
 	}
-	else if (soap_out_PointerToTrsSiteFreqs(soap, "siteFreqs", -1, &a->ns1__TrsSite::siteFreqs, ""))
+	else if (soap_out_PointerToTrsSiteFreqs(soap, "siteFeqs", -1, &a->ns1__TrsSite::siteFreqs, ""))
 		return soap->error;
 	if (!a->ns1__TrsSite::bandplan)
 	{	if (soap_element_empty(soap, "bandplan", 0, NULL))
@@ -16143,7 +16143,7 @@ SOAP_FMAC3 ns1__TrsSite * SOAP_FMAC4 soap_in_ns1__TrsSite(struct soap *soap, con
 				}
 			}
 			if (soap_flag_siteFreqs1 && soap->error == SOAP_TAG_MISMATCH)
-			{	if (soap_in_PointerToTrsSiteFreqs(soap, "siteFreqs", &a->ns1__TrsSite::siteFreqs, "ns1:TrsSiteFreq"))
+			{	if (soap_in_PointerToTrsSiteFreqs(soap, "siteFeqs", &a->ns1__TrsSite::siteFreqs, "ns1:TrsSiteFreq"))
 				{	soap_flag_siteFreqs1--;
 					continue;
 				}

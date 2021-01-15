@@ -21,6 +21,40 @@ The following gsoap-specific preprocessor directives MUST be defined for the pro
 * WITH_NONAMESPACES
 * SOAP_STD_EXPORTS
 
+## Workaround for RadioReference's incorrect WSDL
+As of 12/31/2020, some method responses from the RadioReference.com API may violate the type definitions of their own WSDL. 
+For example, the TalkgroupCat type is defined in the WSDL thus:
+```
+ <xsd:complexType name="TalkgroupCat">
+  <xsd:all>
+   <xsd:element name="tgCid" type="xsd:int" documentation="Test Doco"/>
+   <xsd:element name="sid" type="xsd:int"/>
+   <xsd:element name="tgCname" type="xsd:string"/>
+   <xsd:element name="tgSort" type="xsd:int"/>
+   <xsd:element name="tgSortBy" type="xsd:int"/>
+   <xsd:element name="lat" type="xsd:decimal"/>
+   <xsd:element name="lon" type="xsd:decimal"/>
+   <xsd:element name="range" type="xsd:decimal"/>
+   <xsd:element name="lastUpdated" type="xsd:dateTime"/>
+  </xsd:all>
+ </xsd:complexType>
+```
+But the API may return items of this type with nil element values:
+```
+    <item xsi:type="tns:TalkgroupCat">
+       <tgCid xsi:type="xsd:int">15751</tgCid>
+       <sid xsi:type="xsd:int">6766</sid>
+       <tgCname xsi:type="xsd:string">Wylie Police</tgCname>
+       <tgSort xsi:type="xsd:int">30</tgSort>
+       <tgSortBy xsi:nil="true" xsi:type="xsd:int"/>
+       <lat xsi:type="xsd:decimal">33.02</lat>
+       <lon xsi:type="xsd:decimal">-96.54</lon>
+       <range xsi:type="xsd:decimal">5</range>
+       <lastUpdated xsi:type="xsd:dateTime">2015-05-08T10:50:38-05:00</lastUpdated>
+    </item>
+```
+As a workaround, I defined a new preprocessor directive **WITH_IMPLICIT_NILLABLE** which will cause gsoap's XML validator to ignore nil elements in the RadioReference API response even if those types were not defined in the WSDL with the "nillable=true" attribute
+
 ## Usage
 First, follow [these guidelines](https://docs.microsoft.com/en-us/cpp/build/walkthrough-creating-and-using-a-dynamic-link-library-cpp?view=msvc-160#to-create-a-client-app-in-visual-studio) for creating a console application which references a DLL
 <br/>
